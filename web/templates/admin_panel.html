@@ -1,0 +1,385 @@
+<!-- templates/admin_panel.html -->
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Sinf va Fanlar{% endblock %}
+
+{% block content %}
+<div class="mb-10">
+    <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Admin Panel</h2>
+    <p class="text-gray-600 dark:text-gray-400">Sinf va fanlarni boshqarish</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Sinflar qismi -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                <i class="fas fa-users mr-3 text-blue-500"></i>
+                Sinf/Guruhlar
+            </h3>
+            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-semibold">
+                {{ classes|length }} ta
+            </span>
+        </div>
+        
+        {% if classes %}
+        <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
+            {% for sinf_nomi, oquvchilar in classes.items() %}
+            <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900/50 transition">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800 dark:text-white">{{ sinf_nomi }}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            <i class="fas fa-user-graduate mr-2"></i>
+                            {{ oquvchilar|length }} ta o'quvchi
+                        </p>
+                    </div>
+                    <button onclick="deleteClass('{{ sinf_nomi }}')" 
+                            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="mt-3">
+                    <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">O'quvchilar:</p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for oquvchi in oquvchilar[:5] %}
+                        <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+                            {{ oquvchi }}
+                        </span>
+                        {% endfor %}
+                        
+                        {% if oquvchilar|length > 5 %}
+                        <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full text-sm">
+                            +{{ oquvchilar|length - 5 }} ta
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-users text-gray-300 dark:text-gray-600 text-4xl mb-4"></i>
+            <p class="text-gray-500 dark:text-gray-400">Hozircha sinflar mavjud emas</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Fanlar qismi -->
+    <!-- admin_panel.html - Fanlar qismini O'ZGARTIRAMIZ: -->
+<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                <i class="fas fa-book mr-3 text-green-500"></i>
+                Fanlar
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Fanlarni boshqarish va yangi fan qo'shish</p>
+        </div>
+        <!-- admin_panel.html - ikki xil tugma qo'shamiz: -->
+<div class="flex space-x-3">
+    <input type="text" id="newSubjectName" 
+           placeholder="Yangi fan nomini kiriting"
+           class="flex-1 form-input py-3 text-lg">
+    <div class="flex flex-col space-y-2">
+        <button onclick="addToProfileOnly()" 
+                class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm">
+            <i class="fas fa-user-plus mr-1"></i>
+            Profilga qo'shish
+        </button>
+        <button onclick="addToMasterAndProfile()" 
+                class="px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm">
+            <i class="fas fa-globe mr-1"></i>
+            Barchaga qo'shish
+        </button>
+    </div>
+</div>
+    </div>
+    
+    <!-- Yangi fan qo'shish modal formasi -->
+    <div id="addSubjectModal" class="hidden mb-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+        <div class="flex items-center justify-between mb-4">
+            <h4 class="font-semibold text-blue-700 dark:text-blue-300 text-lg">
+                <i class="fas fa-plus-circle mr-2"></i>
+                Yangi fan qo'shish
+            </h4>
+            <button onclick="closeAddSubjectModal()" 
+                    class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="flex space-x-3">
+            <input type="text" id="newSubjectName" 
+                   placeholder="Yangi fan nomini kiriting"
+                   class="flex-1 form-input py-3 text-lg"
+                   onkeypress="if(event.key === 'Enter') addNewSubject()">
+            <button onclick="addNewSubject()" 
+                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">
+                <i class="fas fa-save mr-2"></i>
+                Qo'shish
+            </button>
+        </div>
+        <div class="mt-3 text-sm text-blue-600 dark:text-blue-400">
+            <i class="fas fa-info-circle mr-2"></i>
+            Yangi fan barcha profilalar uchun mavjud bo'ladi
+        </div>
+    </div>
+    
+    <!-- Mavjud fanlar ro'yxati -->
+    {% if subjects %}
+    <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
+        {% for fan_nomi in subjects %}
+        <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900/50 transition flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-book text-green-500"></i>
+                </div>
+                <div>
+                    <span class="font-semibold text-gray-800 dark:text-white text-lg">{{ fan_nomi }}</span>
+                </div>
+            </div>
+            <button onclick="deleteSubject('{{ fan_nomi }}')" 
+                    class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+                <i class="fas fa-trash text-lg"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <i class="fas fa-book text-gray-300 dark:text-gray-600 text-4xl mb-4"></i>
+        <p class="text-gray-500 dark:text-gray-400">Hozircha fanlar mavjud emas</p>
+        <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">Yangi fan qo'shish uchun yuqoridagi tugmani bosing</p>
+    </div>
+    {% endif %}
+</div>
+</div>
+
+<!-- Xabar uchun joy -->
+<div id="message-container" class="mt-8"></div>
+
+<!-- Asosiy sahifaga qaytish -->
+<div class="mt-10 text-center">
+    <a href="/" class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold text-lg">
+        <i class="fas fa-arrow-left mr-3 text-xl"></i>
+        Asosiy sahifaga qaytish
+    </a>
+</div>
+
+<script>
+// Modal funksiyalari
+function openAddSubjectModal() {
+    console.log('📖 Opening add subject modal');
+    document.getElementById('addSubjectModal').classList.remove('hidden');
+    document.getElementById('newSubjectName').focus();
+}
+
+function closeAddSubjectModal() {
+    document.getElementById('addSubjectModal').classList.add('hidden');
+    document.getElementById('newSubjectName').value = '';
+}
+
+// Yangi fan qo'shish
+
+// Faqat profilga qo'shish
+async function addToProfileOnly() {
+    const subjectName = document.getElementById('newSubjectName').value.trim();
+    if (!subjectName) return;
+    
+    console.log(`👤 Adding to profile only: ${subjectName}`);
+    
+    const response = await fetch('/profile/add-subject', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({subject: subjectName})
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+        showMessage('success', `"${subjectName}" faqat bu profilga qo'shildi`);
+        location.reload();
+    } else {
+        showMessage('error', result.message);
+    }
+}
+
+// Master listga va profilga qo'shish
+async function addToMasterAndProfile() {
+    const subjectName = document.getElementById('newSubjectName').value.trim();
+    if (!subjectName) return;
+    
+    console.log(`🌍 Adding to master and profile: ${subjectName}`);
+    
+    const response = await fetch('/profile/create-subject', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({subject: subjectName})
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+        showMessage('success', `"${subjectName}" barcha profillar uchun qo'shildi`);
+        location.reload();
+    } else {
+        showMessage('error', result.message);
+    }
+}
+
+// Sinfni o'chirish funksiyasi
+async function deleteClass(className) {
+    if (!confirm(`"${className}" sinfini o'chirishni istaysizmi?\n\nBu sinf barcha o'quvchilar, fanlar va ma'lumotlari bilan birga butunlay o'chib ketadi.\n\nBu amalni qaytarib bo'lmaydi!`)) {
+        return;
+    }
+    
+    try {
+        // FormData yaratamiz, chunki backend Form(...) kutmoqda
+        const formData = new FormData();
+        formData.append('sinf_nomi', className);
+        
+        const response = await fetch('/admin/delete-class', {
+            method: 'POST',
+            body: formData
+            // FormData bilan ishlaganda Content-Type ni o'rnatmaslik kerak,
+            // brauzer avtomatik 'multipart/form-data' deb o'rnatadi
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // showMessage funksiyasini chaqiramiz (agar mavjud bo'lsa)
+            if (typeof showMessage === 'function') {
+                showMessage('success', result.message || `"${className}" sinfi o'chirildi!`);
+            } else {
+                alert(result.message || `"${className}" sinfi o'chirildi!`);
+            }
+            
+            // Elementni DOM dan o'chirish
+            const classElement = document.querySelector(`[data-class="${className}"]`);
+            if (classElement) {
+                // Animatsiya
+                classElement.style.opacity = '0';
+                classElement.style.transform = 'translateX(-100px)';
+                classElement.style.transition = 'all 0.5s ease';
+                
+                setTimeout(() => {
+                    classElement.remove();
+                    
+                    // Agar jadval bo'sh bo'lsa, xabar ko'rsatish
+                    const tableBody = document.querySelector('table tbody');
+                    if (tableBody && tableBody.children.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                    Sinf mavjud emas. Yangi sinf qo'shing.
+                                </td>
+                            </tr>
+                        `;
+                    }
+                }, 500);
+            } else {
+                // Agar element topilmasa, 1.5 sekunddan keyin sahifani yangilash
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            }
+        } else {
+            // Xatolik xabarini ko'rsatish
+            if (typeof showMessage === 'function') {
+                showMessage('error', result.message || 'Sinfni o\'chirishda xato');
+            } else {
+                alert(result.message || 'Sinfni o\'chirishda xato');
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        
+        if (typeof showMessage === 'function') {
+            showMessage('error', 'Server bilan bog\'lanishda xato');
+        } else {
+            alert('Server bilan bog\'lanishda xato');
+        }
+    }
+}
+
+// Fanni o'chirish funksiyasini yangilaymiz
+async function deleteSubject(subjectName) {
+    if (!confirm(`"${subjectName}" fani o'chirishni istaysizmi?\n\nBu fan barcha profillardan ham o'chib ketadi.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/profile/remove-subject', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({subject: subjectName})
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showMessage('success', result.message || `"${subjectName}" fani o'chirildi!`);
+            
+            // Elementni DOM dan o'chirish
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showMessage('error', result.message || 'Fanni o\'chirishda xato');
+        }
+    } catch (error) {
+        showMessage('error', 'Server bilan bog\'lanishda xato');
+    }
+}
+
+// Xabarni ko'rsatish (oldingi funksiya)
+function showMessage(type, text) {
+    const container = document.getElementById('message-container');
+    
+    const colorClasses = {
+        success: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+        error: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
+        info: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+    };
+    
+    const icon = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        info: 'fa-info-circle'
+    }[type];
+    
+    container.innerHTML = `
+        <div class="p-5 ${colorClasses[type]} rounded-xl border animate-pulse">
+            <div class="flex items-center">
+                <i class="fas ${icon} text-2xl mr-3"></i>
+                <div>
+                    <p class="font-bold text-lg">${text}</p>
+                    <p class="text-sm mt-1">Sahifa 1.5 soniyadan keyin yangilanadi</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    setTimeout(() => {
+        container.innerHTML = '';
+    }, 5000);
+}
+
+// Enter tugmasi bilan ham qo'shish imkoniyati
+document.addEventListener('DOMContentLoaded', function() {
+    const subjectInput = document.getElementById('newSubjectName');
+    if (subjectInput) {
+        subjectInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addNewSubject();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,326 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="uz" class="{% if dark_mode %}dark{% endif %}">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Baholash Tahlili Generator{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass-effect {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .dark .card-hover:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Form elements */
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            background-color: white;
+            color: #111827;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: transparent;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            background-color: white;
+            color: #111827;
+            font-size: 1rem;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        .form-select:focus {
+            outline: none;
+            border-color: transparent;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Dark mode */
+        .dark .form-input {
+            background-color: #1f2937;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        .dark .form-select {
+            background-color: #1f2937;
+            border-color: #4b5563;
+            color: #f3f4f6;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+        
+        /* Placeholder */
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+        .dark .form-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 600;
+            padding: 0.875rem 2rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: scale(1.02);
+        }
+        .dark .btn-primary {
+            background-color: #4f46e5;
+        }
+        .dark .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        
+        /* Accordion */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .accordion-content.open {
+            max-height: 1000px;
+        }
+        
+        /* Excel button special */
+        .excel-button {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            font-weight: bold;
+            padding: 1rem 3.5rem;
+            border-radius: 0.75rem;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+        }
+        .excel-button:hover {
+            background: linear-gradient(135deg, #15803d, #16a34a);
+            transform: scale(1.02);
+        }
+        .dark .excel-button {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+        .dark .excel-button:hover {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+        }
+        
+        /* Profile badge */
+        .profile-badge {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans min-h-screen transition-colors duration-200">
+    
+    <!-- Header -->
+    {% include "components/header.html" %}
+    
+    <div class="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar with Profile Selector -->
+        <div class="lg:w-1/4">
+            {% include "components/sidebar.html" %}
+            <!-- PROFILE SELECTOR COMPONENT
+            <div class="mb-6 p-4 bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-semibold text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-user-circle mr-2 text-primary-500"></i>
+                        Aktiv profil
+                    </h4>
+                    <button onclick="openProfileModal()" 
+                            class="text-sm bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-800 px-3 py-1 rounded-lg transition">
+                        + Yangi
+                    </button>
+                </div>
+                
+                <select id="profileSelector" onchange="switchProfile(this.value)" 
+                        class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                    {% for profile in profiles %}
+                    <option value="{{ profile.profile_id }}" 
+                            {% if profile.profile_id == active_profile_id %}selected{% endif %}>
+                        {{ profile.profile_name }}
+                        {% if profile.owner != 'system' %}({{ profile.owner }}){% endif %}
+                        {% if profile.profile_id == 'default' %}(Default){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+                <div class="mt-3 flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Har bir profil alohida sinf, fan va sozlamalarga ega
+                </div>
+            </div>  -->
+        </div>
+        
+        <!-- Main Content -->
+        <main class="lg:w-3/4">
+            <!-- Profile Info Bar -->
+            <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user-circle text-blue-500"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-white">
+                                Faol profil: <span class="text-blue-600 dark:text-blue-400">{{ active_profile_name }}</span>
+                            </p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                {{ classes|length }} ta sinf, {{ subjects|length }} ta fan
+                            </p>
+                        </div>
+                    </div>
+                    <a href="/admin" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                        <i class="fas fa-cog mr-1"></i>
+                        Profilni boshqarish
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            {% if error %}
+            <div class="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg animate-pulse">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-3"></i>
+                    <span><strong>Xatolik:</strong> {{ error }}</span>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if success %}
+            <div class="mb-6 p-4 bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-3"></i>
+                    <span>{{ success }}</span>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <!-- Footer -->
+    {% include "components/footer.html" %}
+    {% include "components/profile_modal.html" %}
+    <!-- Scripts -->
+    <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+        
+        const savedMode = localStorage.getItem('darkMode');
+        if (savedMode === 'dark') {
+            htmlElement.classList.add('dark');
+        } else if (savedMode === 'light') {
+            htmlElement.classList.remove('dark');
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            htmlElement.classList.add('dark');
+        }
+        
+        darkModeToggle?.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            const isDark = htmlElement.classList.contains('dark');
+            localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
+            
+            const icon = darkModeToggle.querySelector('i');
+            if (icon) {
+                if (isDark) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            }
+        });
+        // Update icon on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const icon = darkModeToggle?.querySelector('i');
+            if (icon && htmlElement.classList.contains('dark')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

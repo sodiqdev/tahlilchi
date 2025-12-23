@@ -1,0 +1,1 @@
+from .generator import create_assessment_template

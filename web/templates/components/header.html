@@ -1,0 +1,98 @@
+<!-- templates/components/header.html -->
+<header class="sticky top-0 z-50 glass-effect shadow-lg mb-8">
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <!-- Logo and Title -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-primary-600 dark:bg-primary-500 text-white p-3 rounded-xl">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Baholash Tahlili Generator</h1>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Sinf baholash tahlilini tezkor va professional tayyorlang</p>
+                </div>
+            </div>
+            
+            <!-- Right side: Profile Selector, Dark mode toggle -->
+            <div class="flex items-center space-x-4">
+                <!-- Profile Selector (Compact) -->
+                <div class="relative group hidden md:block">
+                    <button onclick="toggleProfileDropdown()" 
+                            class="flex items-center space-x-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-circle text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-white truncate max-w-[120px]">
+                                {{ active_profile_name }}
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[120px]">
+                                {{ classes|length }} sinf, {{ subjects|length }} fan
+                            </p>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-xs ml-1"></i>
+                    </button>
+                    
+                    <!-- Profile Dropdown -->
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-2">Profilni tanlang</h4>
+                            <div class="space-y-2 max-h-60 overflow-y-auto">
+                                {% for profile in profiles %}
+                                <div class="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer {% if profile.profile_id == active_profile_id %}bg-blue-50 dark:bg-blue-900/30{% endif %}"
+                                     onclick="switchProfile('{{ profile.profile_id }}')">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 {% if profile.profile_id == 'default' %}bg-purple-100 dark:bg-purple-900{% else %}bg-blue-100 dark:bg-blue-900{% endif %} rounded-full flex items-center justify-center mr-3">
+                                            <i class="fas {% if profile.profile_id == 'default' %}fa-database{% else %}fa-user{% endif %} text-sm {% if profile.profile_id == 'default' %}text-purple-600 dark:text-purple-400{% else %}text-blue-600 dark:text-blue-400{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-800 dark:text-white">{{ profile.profile_name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                {% if profile.owner != 'system' %}{{ profile.owner }} | {% endif %}
+                                                {{ profile.stats.classes }} sinf
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {% if profile.profile_id == active_profile_id %}
+                                    <i class="fas fa-check text-green-500"></i>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <button onclick="openProfileModal()" 
+                                    class="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition text-sm">
+                                <i class="fas fa-plus"></i>
+                                <span>Yangi profil</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dark Mode Toggle -->
+                <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    <i class="fas fa-moon text-gray-800 dark:text-yellow-400"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+// Profile dropdown toggle
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('hidden');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('profileDropdown');
+    const profileBtn = document.querySelector('[onclick="toggleProfileDropdown()"]');
+    
+    if (!profileBtn.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
+</script>

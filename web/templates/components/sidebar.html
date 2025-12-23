@@ -1,0 +1,54 @@
+<!-- templates/components/sidebar.html -->
+<nav class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6 lg:mb-0 sticky top-24">
+  <div class="space-y-1">
+    <a href="/" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 transition {% if request.url.path == '/' %}bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400 font-semibold{% endif %}">
+      <i class="fas fa-home text-lg"></i>
+      <span>Asosiy sahifa</span>
+    </a>
+
+    <a href="/journal-upload" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 transition {% if 'journal-upload' in request.url.path %}bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-400 font-semibold{% endif %}">
+      <i class="fas fa-file-upload text-lg"></i>
+      <span>Jurnal yuklash</span>
+      <span class="ml-auto bg-green-500 text-white text-xs px-2 py-1 rounded-full">Yangi</span>
+    </a>
+
+    {% if is_admin %}
+      <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
+        <a href="/admin" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+          <i class="fas fa-cog text-gray-500"></i>
+          <span class="text-sm">Admin Panel</span>
+        </a>
+      </div>
+    {% endif %}
+
+    <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-3 px-3">Statistika</p>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <span class="text-sm">Sinf/guruhlar</span>
+          <span class="font-bold text-blue-600 dark:text-blue-400">{{ classes|length }}</span>
+        </div>
+        <div class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+          <span class="text-sm">Fanlar</span>
+          <span class="font-bold text-green-600 dark:text-green-400">{{ subjects|length }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-3 px-3">Foydali havolalar</p>
+      <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 transition">
+        <i class="fas fa-question-circle"></i>
+        <span class="text-sm">Qo'llanma</span>
+      </a>
+      <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 transition">
+        <i class="fas fa-download"></i>
+        <span class="text-sm">Namuna fayllar</span>
+      </a>
+      <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 transition">
+        <i class="fas fa-cog"></i>
+        <span class="text-sm">Sozlamalar</span>
+      </a>
+    </div>
+  </div>
+</nav>

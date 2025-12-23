@@ -1,0 +1,333 @@
+<!-- web/templates/components/profile_manager.html -->
+<div id="profileManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                <i class="fas fa-cog mr-2 text-blue-500"></i>
+                Profilni boshqarish
+            </h3>
+            <button onclick="closeProfileManager()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto max-h-[70vh]">
+            <!-- Current Profile Subjects -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-semibold text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-book mr-2 text-purple-500"></i>
+                        Profildagi fanlar
+                    </h4>
+                    <button onclick="openAddSubjectModal()" 
+                            class="text-sm bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-800 px-3 py-1 rounded-lg transition">
+                        + Yangi fan
+                    </button>
+                </div>
+                
+                <div id="currentSubjects" class="flex flex-wrap gap-2 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl min-h-20">
+                    <!-- Subjects will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Add New Subject Modal -->
+            <div id="addSubjectModal" class="hidden mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                <div class="flex items-center justify-between mb-3">
+                    <h5 class="font-semibold text-blue-700 dark:text-blue-300">
+                        <i class="fas fa-plus mr-2"></i>
+                        Yangi fan qo'shish
+                    </h5>
+                    <button onclick="closeAddSubjectModal()" class="text-blue-500 hover:text-blue-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <input type="text" id="newSubjectInput" 
+                           placeholder="Yangi fan nomi"
+                           class="flex-1 form-input text-sm py-2">
+                    <button onclick="addNewSubject()" 
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">
+                        Qo'shish
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Yangi fan barcha profilalar uchun mavjud bo'ladi
+                </p>
+            </div>
+            
+            <!-- Available Subjects from Master -->
+            <div class="mb-8">
+                <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-list-alt mr-2 text-orange-500"></i>
+                    Mavjud fanlar (bazadan)
+                </h4>
+                
+                <div id="availableSubjects" class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto p-3 border border-gray-200 dark:border-gray-700 rounded-xl">
+                    <!-- Available subjects will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Profile Classes -->
+            <div>
+                <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-users mr-2 text-green-500"></i>
+                    Profildagi sinflar
+                </h4>
+                
+                <div id="currentClasses" class="space-y-2 max-h-48 overflow-y-auto p-3 border border-gray-200 dark:border-gray-700 rounded-xl">
+                    <!-- Classes will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3 p-6 border-t border-gray-200 dark:border-gray-700">
+            <button onclick="closeProfileManager()" 
+                    class="px-4 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition">
+                Yopish
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentProfileSubjects = [];
+let availableMasterSubjects = [];
+
+// Load profile data
+async function loadProfileData() {
+    try {
+        // Load current profile subjects
+        const profileResponse = await fetch(`/profile/${activeProfileId}/data`);
+        const profileData = await profileResponse.json();
+        
+        if (profileData.success) {
+            currentProfileSubjects = profileData.data.subjects || [];
+            updateCurrentSubjectsDisplay();
+        }
+        
+        // Load master subjects
+        const masterResponse = await fetch('/profile/master-data');
+        const masterData = await masterResponse.json();
+        
+        if (masterData.success) {
+            availableMasterSubjects = masterData.subjects || [];
+            updateAvailableSubjectsDisplay();
+        }
+        
+        // Load classes
+        loadProfileClasses();
+        
+    } catch (error) {
+        console.error('Error loading profile data:', error);
+    }
+}
+
+function updateCurrentSubjectsDisplay() {
+    const container = document.getElementById('currentSubjects');
+    if (!container) return;
+    
+    if (currentProfileSubjects.length === 0) {
+        container.innerHTML = `
+            <div class="text-center w-full py-8 text-gray-500 dark:text-gray-400">
+                <i class="fas fa-book-open text-2xl mb-2"></i>
+                <p>Hozircha fanlar qo'shilmagan</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = currentProfileSubjects.map(subject => `
+        <div class="inline-flex items-center px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg">
+            <span class="mr-2 text-gray-700 dark:text-gray-300">${subject}</span>
+            <button onclick="removeSubject('${subject}')" 
+                    class="text-red-500 hover:text-red-700 text-sm">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+function updateAvailableSubjectsDisplay() {
+    const container = document.getElementById('availableSubjects');
+    if (!container) return;
+    
+    // Filter out subjects already in profile
+    const available = availableMasterSubjects.filter(s => !currentProfileSubjects.includes(s));
+    
+    if (available.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-3 text-center py-4 text-gray-500 dark:text-gray-400">
+                <i class="fas fa-check-circle mr-2"></i>
+                Barcha fanlar profilda mavjud
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = available.map(subject => `
+        <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900/50 rounded">
+            <span class="text-sm text-gray-700 dark:text-gray-300">${subject}</span>
+            <button onclick="addExistingSubject('${subject}')" 
+                    class="text-green-500 hover:text-green-700 text-sm">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+async function loadProfileClasses() {
+    try {
+        const response = await fetch(`/profile/${activeProfileId}/classes`);
+        const data = await response.json();
+        
+        const container = document.getElementById('currentClasses');
+        if (!container || !data.success) return;
+        
+        const classes = data.classes || {};
+        
+        if (Object.keys(classes).length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-users text-2xl mb-2"></i>
+                    <p>Hozircha sinflar qo'shilmagan</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = Object.entries(classes).map(([className, students]) => `
+            <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div>
+                    <span class="font-medium text-gray-800 dark:text-white">${className}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400 ml-3">
+                        ${students.length} ta o'quvchi
+                    </span>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editClass('${className}')" 
+                            class="text-blue-500 hover:text-blue-700">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteClassFromProfile('${className}')" 
+                            class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading classes:', error);
+    }
+}
+
+// Subject operations
+async function addExistingSubject(subject) {
+    try {
+        const response = await fetch('/profile/add-subject', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({subject: subject})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Fan profilga qo\'shildi');
+            loadProfileData(); // Reload data
+        } else {
+            alert('❌ Xatolik: ' + data.message);
+        }
+    } catch (error) {
+        alert('❌ Server bilan bog\'lanishda xato');
+    }
+}
+
+async function removeSubject(subject) {
+    if (!confirm(`"${subject}" fani profildan olib tashlashni istaysizmi?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/profile/remove-subject', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({subject: subject})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Fan profildan olib tashlandi');
+            loadProfileData(); // Reload data
+        } else {
+            alert('❌ Xatolik: ' + data.message);
+        }
+    } catch (error) {
+        alert('❌ Server bilan bog\'lanishda xato');
+    }
+}
+
+async function addNewSubject() {
+    const input = document.getElementById('newSubjectInput');
+    const subject = input.value.trim();
+    
+    if (!subject) {
+        alert('Iltimos, fan nomini kiriting');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/profile/create-subject', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({subject: subject})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Yangi fan yaratildi va profilga qo\'shildi');
+            input.value = '';
+            closeAddSubjectModal();
+            loadProfileData(); // Reload data
+        } else {
+            alert('❌ Xatolik: ' + data.message);
+        }
+    } catch (error) {
+        alert('❌ Server bilan bog\'lanishda xato');
+    }
+}
+
+// Modal functions
+function openProfileManager() {
+    loadProfileData();
+    document.getElementById('profileManagerModal').classList.remove('hidden');
+}
+
+function closeProfileManager() {
+    document.getElementById('profileManagerModal').classList.add('hidden');
+}
+
+function openAddSubjectModal() {
+    document.getElementById('addSubjectModal').classList.remove('hidden');
+}
+
+function closeAddSubjectModal() {
+    document.getElementById('addSubjectModal').classList.add('hidden');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Add profile manager button to page
+    const profileBar = document.querySelector('.profile-info-bar');
+    if (profileBar) {
+        const manageBtn = document.createElement('button');
+        manageBtn.innerHTML = '<i class="fas fa-cog mr-1"></i> Boshqarish';
+        manageBtn.className = 'text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 ml-4';
+        manageBtn.onclick = openProfileManager;
+        profileBar.appendChild(manageBtn);
+    }
+});
+</script>

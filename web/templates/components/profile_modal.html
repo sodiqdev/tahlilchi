@@ -1,0 +1,409 @@
+<!-- web/templates/components/profile_modal.html -->
+<div id="profileModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Yangi profil yaratish</h3>
+            <button onclick="closeProfileModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto max-h-[70vh]">
+            <form id="createProfileForm" class="space-y-6">
+                <!-- Basic Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="fas fa-signature mr-2 text-blue-500"></i>
+                            Profil nomi *
+                        </label>
+                        <input type="text" id="profileName" required 
+                               class="form-input" placeholder="Masalan: 9-sinflar profili">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="fas fa-user mr-2 text-green-500"></i>
+                            Egasi (ixtiyoriy)
+                        </label>
+                        <input type="text" id="profileOwner" 
+                               class="form-input" placeholder="O'qituvchi ismi">
+                    </div>
+                </div>
+                
+                <!-- Subjects Selection -->
+                <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-1">
+                                <i class="fas fa-book mr-2 text-purple-500"></i>
+                                Fanlarni tanlang *
+                            </h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Kamida 1 ta fan tanlashingiz kerak</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" onclick="selectAllSubjects()" 
+                                    class="text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800 px-3 py-1 rounded-lg transition">
+                                Barchasi
+                            </button>
+                            <button type="button" onclick="deselectAllSubjects()" 
+                                    class="text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-1 rounded-lg transition">
+                                Hech biri
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-48 overflow-y-auto p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+                        id="subjectsContainer">
+                        <!-- Subjects will be loaded dynamically -->
+                    </div>
+                    <div id="subjectError" class="text-red-500 text-sm mt-2 hidden">
+                        Kamida 1 ta fan tanlashingiz kerak
+                    </div>
+                </div>
+                
+                <!-- Classes Selection -->
+                <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-1">
+                                <i class="fas fa-users mr-2 text-orange-500"></i>
+                                Sinflarni tanlang (ixtiyoriy)
+                            </h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Faqat kerakli sinflarni tanlang</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" onclick="selectAllClasses()" 
+                                    class="text-sm bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-800 px-3 py-1 rounded-lg transition">
+                                Barchasi
+                            </button>
+                            <button type="button" onclick="deselectAllClasses()" 
+                                    class="text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-1 rounded-lg transition">
+                                Hech biri
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-48 overflow-y-auto p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+                        id="classesContainer">
+                        <!-- Classes will be loaded dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" onclick="closeProfileModal()" 
+                            class="px-4 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition">
+                        Bekor qilish
+                    </button>
+                    <button type="submit" id="createProfileBtn"
+                            class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition flex items-center">
+                        <i class="fas fa-spinner fa-spin hidden mr-2" id="profileLoading"></i>
+                        <i class="fas fa-save mr-2"></i>
+                        Profilni yaratish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables for profile modal
+let availableSubjects = [];
+let availableClasses = [];
+
+// Load master data when modal opens
+async function loadMasterDataForModal() {
+    try {
+        const response = await fetch('/profile/master-data');
+        const data = await response.json();
+        
+        if (data.success) {
+            availableSubjects = data.subjects || [];
+            availableClasses = data.classes || [];
+            updateModalSelections();
+        }
+    } catch (error) {
+        console.error('Error loading master data:', error);
+        alert('Ma\'lumotlarni yuklashda xato');
+    }
+}
+
+// profile_modal.html dagi updateModalSelections funksiyasini O'ZGARTIRAMIZ:
+function updateModalSelections() {
+    console.log('🔧 updateModalSelections called');
+    
+    // Update subjects - ID bilan
+    let subjectsContainer = document.getElementById('subjectsContainer');
+    if (!subjectsContainer) {
+        // Fallback: CSS selector
+        const containers = document.querySelectorAll('#profileModal .grid.grid-cols-2');
+        if (containers.length >= 1) subjectsContainer = containers[0];
+    }
+    
+    if (subjectsContainer && availableSubjects.length > 0) {
+        console.log(`📝 Rendering ${availableSubjects.length} subjects`);
+        
+        // 1. HTML ni yaratish (checked attribute'siz)
+        subjectsContainer.innerHTML = availableSubjects.map((subject, index) => `
+            <div class="flex items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
+                <input type="checkbox" id="subject_${index}" 
+                       value="${subject}" 
+                       class="mr-2 h-5 w-5 text-blue-600 rounded focus:ring-blue-500 subject-checkbox">
+                <label for="subject_${index}" 
+                       class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+                    ${subject}
+                </label>
+            </div>
+        `).join('');
+        
+        // 2. DOM render bo'lgandan KEYIN checked qilish
+        setTimeout(() => {
+            const subjectBoxes = subjectsContainer.querySelectorAll('.subject-checkbox');
+            subjectBoxes.forEach(box => {
+                box.checked = true;  // ← DOM property orqali
+            });
+            console.log(`✅ ${subjectBoxes.length} subjects set to checked via DOM`);
+        }, 10);
+    }
+    
+    // Update classes - ID bilan
+    let classesContainer = document.getElementById('classesContainer');
+    if (!classesContainer) {
+        // Fallback: CSS selector  
+        const containers = document.querySelectorAll('#profileModal .grid.grid-cols-2');
+        if (containers.length >= 2) classesContainer = containers[1];
+    }
+    
+    if (classesContainer && availableClasses.length > 0) {
+        console.log(`📝 Rendering ${availableClasses.length} classes`);
+        
+        // 1. HTML ni yaratish (checked attribute'siz)
+        classesContainer.innerHTML = availableClasses.map((cls, index) => `
+            <div class="flex items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
+                <input type="checkbox" id="class_${index}" 
+                       value="${cls}" 
+                       class="mr-2 h-5 w-5 text-green-600 rounded focus:ring-green-500 class-checkbox">
+                <label for="class_${index}" 
+                       class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+                    ${cls}
+                </label>
+            </div>
+        `).join('');
+        
+        // 2. DOM render bo'lgandan KEYIN checked qilish
+        setTimeout(() => {
+            const classBoxes = classesContainer.querySelectorAll('.class-checkbox');
+            classBoxes.forEach(box => {
+                box.checked = true;  // ← DOM property orqali
+            });
+            console.log(`✅ ${classBoxes.length} classes set to checked via DOM`);
+        }, 10);
+    }
+}
+// Selection functions - IMPROVED
+function selectAllSubjects() {
+    console.log('📌 selectAllSubjects called');
+    const checkboxes = document.querySelectorAll('#profileModal .subject-checkbox');
+    console.log(`Found ${checkboxes.length} subject checkboxes`);
+    
+    if (checkboxes.length === 0) {
+        console.warn('⚠️ No subject checkboxes found!');
+        // Qayta urinib ko'rish
+        setTimeout(selectAllSubjects, 100);
+        return;
+    }
+    
+    checkboxes.forEach(cb => cb.checked = true);
+    console.log('✅ All subjects selected');
+}
+
+function deselectAllSubjects() {
+    console.log('📌 deselectAllSubjects called');
+    const checkboxes = document.querySelectorAll('#profileModal .subject-checkbox');
+    console.log(`Found ${checkboxes.length} subject checkboxes`);
+    
+    if (checkboxes.length === 0) {
+        console.warn('⚠️ No subject checkboxes found!');
+        setTimeout(deselectAllSubjects, 100);
+        return;
+    }
+    
+    checkboxes.forEach(cb => cb.checked = false);
+    console.log('✅ All subjects deselected');
+}
+
+function selectAllClasses() {
+    console.log('📌 selectAllClasses called');
+    const checkboxes = document.querySelectorAll('#profileModal .class-checkbox');
+    console.log(`Found ${checkboxes.length} class checkboxes`);
+    
+    if (checkboxes.length === 0) {
+        console.warn('⚠️ No class checkboxes found!');
+        setTimeout(selectAllClasses, 100);
+        return;
+    }
+    
+    checkboxes.forEach(cb => cb.checked = true);
+    console.log('✅ All classes selected');
+}
+
+function deselectAllClasses() {
+    console.log('📌 deselectAllClasses called');
+    const checkboxes = document.querySelectorAll('#profileModal .class-checkbox');
+    console.log(`Found ${checkboxes.length} class checkboxes`);
+    
+    if (checkboxes.length === 0) {
+        console.warn('⚠️ No class checkboxes found!');
+        setTimeout(deselectAllClasses, 100);
+        return;
+    }
+    
+    checkboxes.forEach(cb => cb.checked = false);
+    console.log('✅ All classes deselected');
+}
+
+// Modal functions
+async function openProfileModal() {
+    console.log('🚀 openProfileModal called');
+    const modal = document.getElementById('profileModal');
+    
+    if (!modal) {
+        console.error('❌ Profile modal not found!');
+        return;
+    }
+    
+    // Modalni ochish
+    modal.classList.remove('hidden');
+    
+    // Ma'lumotlarni yuklash
+    await loadMasterDataForModal();
+    
+    // Modal to'liq ochilgandan keyin checkbox'larni checked qilish
+    setTimeout(() => {
+        console.log('🎯 Finalizing checkbox states...');
+        
+        // Subject checkbox'larini checked qilish
+        const subjectBoxes = document.querySelectorAll('#profileModal .subject-checkbox');
+        subjectBoxes.forEach(box => box.checked = true);
+        console.log(`✅ ${subjectBoxes.length} subjects checked`);
+        
+        // Class checkbox'larini checked qilish  
+        const classBoxes = document.querySelectorAll('#profileModal .class-checkbox');
+        classBoxes.forEach(box => box.checked = true);
+        console.log(`✅ ${classBoxes.length} classes checked`);
+    }, 200);
+}
+
+function closeProfileModal() {
+    document.getElementById('profileModal').classList.add('hidden');
+    // Reset form
+    document.getElementById('profileName').value = '';
+    document.getElementById('profileOwner').value = '';
+}
+
+// Create profile
+document.getElementById('createProfileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    console.log('📤 Profile form submitted - FIXED VERSION');
+    
+    const name = document.getElementById('profileName').value.trim();
+    const owner = document.getElementById('profileOwner').value.trim() || 'user';
+    
+    // Tanlangan fanlar - class selector orqali
+    const selectedSubjects = Array.from(
+        document.querySelectorAll('#profileModal .subject-checkbox:checked')
+    ).map(cb => {
+        console.log(`Subject checkbox: ${cb.value}, checked: ${cb.checked}`);
+        return cb.value;
+    }).filter(value => value && value.trim().length > 0);
+    
+    console.log('Selected subjects:', selectedSubjects);
+    console.log('Selected subjects count:', selectedSubjects.length);
+    
+    // Tanlangan sinflar
+    const selectedClasses = Array.from(
+        document.querySelectorAll('#profileModal .class-checkbox:checked')
+    ).map(cb => cb.value);
+    
+    // Validation
+    if (!name) {
+        alert('Iltimos, profil nomini kiriting');
+        return;
+    }
+    
+    if (selectedSubjects.length === 0) {
+        console.error('❌ VALIDATION FAILED: No subjects selected');
+        
+        // Debug info
+        const allSubjectBoxes = document.querySelectorAll('#profileModal .subject-checkbox');
+        console.log('All subject boxes:', allSubjectBoxes.length);
+        allSubjectBoxes.forEach(box => {
+            console.log(`Box: value="${box.value}", checked=${box.checked}`);
+        });
+        
+        alert('Kamida 1 ta fan tanlashingiz kerak');
+        return;
+    }
+    
+    // Disable button and show loading
+    const btn = document.getElementById('createProfileBtn');
+    const loading = document.getElementById('profileLoading');
+    btn.disabled = true;
+    if (loading) loading.classList.remove('hidden');
+    
+    try {
+        const response = await fetch('/profile/create-with-selection', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                name: name,
+                owner: owner,
+                subjects: selectedSubjects,
+                classes: selectedClasses
+            })
+        });
+        
+        const result = await response.json();
+        console.log('📨 Create profile response:', result);
+        
+        if (result.success) {
+            alert('✅ Yangi profil yaratildi!');
+            closeProfileModal();
+            // Switch to new profile
+            await switchProfile(result.profile.profile_id);
+        } else {
+            alert('❌ Xatolik: ' + result.message);
+        }
+    } catch (error) {
+        console.error('❌ Network error:', error);
+        alert('❌ Server bilan bog\'lanishda xato');
+    } finally {
+        btn.disabled = false;
+        if (loading) loading.classList.add('hidden');
+    }
+});
+
+// Switch profile function
+async function switchProfile(profileId) {
+    try {
+        const response = await fetch('/profile/switch', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({profile_id: profileId})
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            // Reload page to update data
+            window.location.reload();
+        } else {
+            alert('Profil o\'zgartirishda xato: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error switching profile:', error);
+        alert('Server bilan bog\'lanishda xato');
+    }
+}
+</script>

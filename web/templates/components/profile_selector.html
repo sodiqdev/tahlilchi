@@ -1,0 +1,142 @@
+<!-- web/templates/components/profile_selector.html -->
+<div class="mb-6 p-4 bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between mb-4">
+        <h4 class="font-semibold text-gray-700 dark:text-gray-300">
+            <i class="fas fa-user-circle mr-2 text-primary-500"></i>
+            Aktiv profil
+        </h4>
+        <button onclick="openProfileModal()" 
+                class="text-sm bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-800 px-3 py-1 rounded-lg transition">
+            + Yangi profil
+        </button>
+    </div>
+    
+    <select id="profileSelector" onchange="switchProfile(this.value)" 
+            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+        {% for profile in profiles %}
+        <option value="{{ profile.profile_id }}" 
+                {% if profile.profile_id == active_profile_id %}selected{% endif %}>
+            {{ profile.profile_name }}
+            {% if profile.owner != 'system' %}({{ profile.owner }}){% endif %}
+            {% if profile.profile_id == 'default' %}(Default){% endif %}
+        </option>
+        {% endfor %}
+    </select>
+    
+    <div class="mt-3 flex items-center text-sm text-gray-600 dark:text-gray-400">
+        <i class="fas fa-info-circle mr-2"></i>
+        Har bir profil alohida sinf, fan va sozlamalarga ega
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div id="profileModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Yangi profil yaratish</h3>
+            <button onclick="closeProfileModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form id="createProfileForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Profil nomi *
+                </label>
+                <input type="text" id="profileName" required 
+                       class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Egasi (ixtiyoriy)
+                </label>
+                <input type="text" id="profileOwner" 
+                       class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                       placeholder="O'qituvchi ismi">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Asosiy profil
+                </label>
+                <select id="baseProfile" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                    {% for profile in profiles %}
+                    <option value="{{ profile.profile_id }}">
+                        {{ profile.profile_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeProfileModal()" 
+                        class="px-4 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition">
+                    Bekor qilish
+                </button>
+                <button type="submit" 
+                        class="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition">
+                    <i class="fas fa-save mr-2"></i>
+                    Yaratish
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Profile functions
+function switchProfile(profileId) {
+    fetch('/profile/switch', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({profile_id: profileId})
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Xatolik: ' + data.message);
+        }
+    });
+}
+
+function openProfileModal() {
+    document.getElementById('profileModal').classList.remove('hidden');
+}
+
+function closeProfileModal() {
+    document.getElementById('profileModal').classList.add('hidden');
+}
+
+document.getElementById('createProfileForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('profileName').value;
+    const owner = document.getElementById('profileOwner').value || 'user';
+    const baseProfile = document.getElementById('baseProfile').value;
+    
+    const response = await fetch('/profile/create', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, owner, base_profile: baseProfile})
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+        alert('Yangi profil yaratildi: ' + result.profile_name);
+        closeProfileModal();
+        switchProfile(result.profile_id);
+    } else {
+        alert('Xatolik: ' + result.message);
+    }
+});
+
+// Close modal on outside click
+document.getElementById('profileModal')?.addEventListener('click', function(e) {
+    if (e.target.id === 'profileModal') {
+        closeProfileModal();
+    }
+});
+</script>

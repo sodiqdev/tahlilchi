@@ -1,0 +1,110 @@
+<!-- templates/admin_upload.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Admin Panel - Baholash Tahlili Generator
+{% endblock %}
+
+{% block content %}
+  <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Admin Panel</h2>
+    <p class="text-gray-600 dark:text-gray-400">Butun maktab o'quvchilarini yuklang va bazani yangilang</p>
+  </div>
+
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 card-hover">
+      <div class="mb-8">
+        <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-user-shield text-2xl text-purple-600 dark:text-purple-400"></i>
+        </div>
+        <h3 class="text-xl font-bold text-center text-gray-800 dark:text-white mb-2">Maktab bazasini yuklash</h3>
+        <p class="text-gray-600 dark:text-gray-400 text-center">Butun maktabning o'quvchilar ro'yxatini Excel yoki HTML formatida yuklang</p>
+      </div>
+
+      <form method="post" action="/admin-upload" enctype="multipart/form-data" class="space-y-6">
+        <!-- File upload -->
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center bg-gray-50 dark:bg-gray-900/50">
+          <label class="block mb-4">
+            <i class="fas fa-database text-3xl text-gray-400 dark:text-gray-500 mb-3"></i>
+            <span class="text-gray-700 dark:text-gray-300 font-medium">Bazani yangilash uchun fayl yuklang</span>
+          </label>
+
+          <div class="relative">
+            <input type="file" name="file" accept=".xls,.xlsx,.html" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+            <div class="border-2 border-dashed border-primary-400 dark:border-primary-600 rounded-xl p-6 bg-primary-50 dark:bg-primary-900/20">
+              <div class="py-4">
+                <p class="text-primary-700 dark:text-primary-300 font-medium">
+                  <i class="fas fa-upload mr-2"></i>
+                  Faylni tanlang
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">.xls, .xlsx yoki .html formatlari qabul qilinadi</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <i class="fas fa-file-excel text-blue-500 mb-2"></i>
+              <p class="text-xs font-medium">Excel (.xls)</p>
+            </div>
+            <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <i class="fas fa-file-excel text-green-500 mb-2"></i>
+              <p class="text-xs font-medium">Excel (.xlsx)</p>
+            </div>
+            <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <i class="fas fa-file-code text-purple-500 mb-2"></i>
+              <p class="text-xs font-medium">HTML (.html)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning message -->
+        <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 dark:border-yellow-600">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                <strong>Diqqat:</strong> Bu harakat mavjud barcha sinf va o'quvchilar ma'lumotlarini yangilaydi. Oldindan tayyorlangan bazani yuklang.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <div class="text-center pt-4">
+          <button type="submit" style="background-color: #16a34a; color: white; font-weight: bold; padding: 1rem 3.5rem; border-radius: 0.75rem; font-size: 1.25rem; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#15803d'" onmouseout="this.style.backgroundColor='#16a34a'">
+            <i class="fas fa-file-excel mr-3"></i>
+            Excel fayl yaratish va bazani yangliash
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <h4 class="font-semibold text-gray-800 dark:text-white mb-4">Foydali ma'lumotlar</h4>
+        <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+            <span>Fayl strukturasini tekshirish uchun namuna fayl yuklab olishingiz mumkin</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+            <span>Yangi fayl yuklanganda avvalgi ma'lumotlar arxivlanadi</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+            <span>Yuklashdan so'ng yangi sinflar ro'yxatda paydo bo'ladi</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="mt-8 text-center">
+        <a href="/" class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
+          <i class="fas fa-arrow-left mr-2"></i>
+          Asosiy sahifaga qaytish
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

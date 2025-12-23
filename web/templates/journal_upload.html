@@ -1,0 +1,117 @@
+<!-- templates/journal_upload.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Jurnal yuklash - Baholash Tahlili Generator
+{% endblock %}
+
+{% block content %}
+  <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Jurnal yuklash orqali Excel yaratish</h2>
+    <p class="text-gray-600 dark:text-gray-400">Fan jurnalini yuklang va avtomatik tahlil Excel faylini oling</p>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 card-hover">
+    <form method="post" action="/journal-upload" enctype="multipart/form-data" class="space-y-8">
+      <!-- Jurnal yuklash qismi -->
+      <div class="border-3 border-dashed border-primary-300 dark:border-primary-700 rounded-2xl p-8 text-center bg-primary-50 dark:bg-primary-900/20 transition hover:bg-primary-100 dark:hover:bg-primary-900/30">
+        <div class="mb-6">
+          <div class="w-20 h-20 bg-primary-100 dark:bg-primary-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-file-excel text-4xl text-primary-600 dark:text-primary-400"></i>
+          </div>
+          <label class="block text-xl font-bold text-gray-800 dark:text-white mb-2">Fan jurnalini yuklang</label>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">.xls yoki .xlsx formatida</p>
+        </div>
+
+        <div class="relative">
+          <input type="file" name="file" accept=".xls,.xlsx" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+          <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 bg-gray-50 dark:bg-gray-900/50">
+            <div class="py-4">
+              <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 dark:text-gray-500 mb-3"></i>
+              <p class="text-gray-700 dark:text-gray-300 font-medium">
+                Faylni bu yerga torting yoki <span class="text-primary-600 dark:text-primary-400">bosing</span>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Maksimal hajm: 10MB</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <p class="text-sm text-blue-700 dark:text-blue-300">
+            <i class="fas fa-info-circle mr-2"></i>
+            Jurnaldan avtomatik ravishda sinf/guruh nomi va o'quvchilar ro'yxati olinadi
+          </p>
+        </div>
+      </div>
+
+      <!-- Qolgan inputlar -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fan</label>
+          <select name="fan" required class="form-select">
+            {% for subject in subjects %}
+              <option value="{{ subject }}">{{ subject }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Chorak</label>
+          <select name="chorak" required class="form-select">
+            <option value="1">1-chorak</option>
+            <option value="2">2-chorak</option>
+            <option value="3">3-chorak</option>
+            <option value="4">4-chorak</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Imtihon nomi</label>
+          <input type="text" name="imtihon_nomi" required value="BSB" class="form-input" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Topshiriqlar soni</label>
+          <input type="number" name="num_tasks" required min="1" max="50" value="5" class="form-input" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Maksimal ballar</label>
+          <input type="text" name="max_scores_str" placeholder="10, 10, 10, 10, 10" class="form-input" />
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Vergul bilan ajrating. Bo'sh qoldirsangiz — barchasi 10 ball</p>
+        </div>
+      </div>
+
+      <!-- Qo'shimcha sozlamalar -->
+      <div class="border-t-2 border-gray-200 dark:border-gray-700 pt-8">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-6 flex items-center">
+          <i class="fas fa-cogs mr-3 text-gray-500"></i>
+          Qo'shimcha ma'lumotlar (ixtiyoriy)
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <input type="text" name="tuman" placeholder="Tuman ({{ settings.tuman }})" class="form-input" />
+          <input type="text" name="maktab" placeholder="Maktab ({{ settings.maktab }})" class="form-input" />
+          <input type="text" name="oibdo" placeholder="O'IBDO ({{ settings.oibdo }})" class="form-input" />
+          <input type="text" name="metod_rahbari" placeholder="Metod rahbari ({{ settings.metod_rahbari }})" class="form-input" />
+          <input type="text" name="fan_oqituvchisi" placeholder="Fan o'qituvchisi ({{ settings.fan_oqituvchisi }})" class="form-input md:col-span-2" />
+        </div>
+      </div>
+
+      <!-- Submit button -->
+      <div class="text-center pt-8">
+        <button type="submit" style="background-color: #16a34a; color: white; font-weight: bold; padding: 1rem 3.5rem; border-radius: 0.75rem; font-size: 1.25rem; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#15803d'" onmouseout="this.style.backgroundColor='#16a34a'">
+          <i class="fas fa-file-excel mr-3"></i>
+          Excel fayl yaratish va yuklab olish
+        </button>
+        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Fayl yaratilgandan so'ng avtomatik yuklab olinadi</p>
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-10 text-center">
+    <a href="/" class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
+      <i class="fas fa-arrow-left mr-2"></i>
+      Asosiy sahifaga qaytish
+    </a>
+  </div>
+{% endblock %}

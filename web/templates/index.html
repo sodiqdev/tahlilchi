@@ -1,0 +1,358 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Asosiy sahifa - Baholash Tahlili Generator
+{% endblock %}
+
+{% block content %}
+  <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Baholash tahlilini yaratish</h2>
+    <p class="text-gray-600 dark:text-gray-400">Kerakli ma'lumotlarni kiriting va Excel fayl yarating</p>
+  </div>
+
+  <form method="post" action="/generate" class="space-y-8">
+    <!-- Asosiy maydonlar -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 card-hover">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+        <i class="fas fa-file-alt mr-3 text-primary-600 dark:text-primary-400"></i>
+        Asosiy ma'lumotlar
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-users mr-2"></i>
+            Sinf
+          </label>
+          <select name="sinf" required class="form-select">
+            {% for sinf in classes %}
+              <option value="{{ sinf }}">{{ sinf }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-book mr-2"></i>
+            Fan
+          </label>
+          <select name="fan" required class="form-select">
+            {% for subject in subjects %}
+              <option value="{{ subject }}">{{ subject }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-calendar-alt mr-2"></i>
+            Chorak
+          </label>
+          <select name="chorak" required class="form-select">
+            <option value="1">1-chorak</option>
+            <option value="2">2-chorak</option>
+            <option value="3">3-chorak</option>
+            <option value="4">4-chorak</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-file-signature mr-2"></i>
+            Imtihon nomi
+          </label>
+          <input type="text" name="imtihon_nomi" required value="BSB" class="form-input" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-tasks mr-2"></i>
+            Topshiriqlar soni
+          </label>
+          <input type="number" name="num_tasks" required min="1" max="50" value="5" class="form-input" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-star mr-2"></i>
+            Maksimal ballar
+          </label>
+          <input type="text" name="max_scores_str" placeholder="5, 5, 5, 5, 5" class="form-input" />
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            <i class="fas fa-info-circle mr-1"></i>
+            Vergul bilan ajrating (masalan: 10,15,20,5). Bo'sh qoldirsangiz — barchasi 10 ball
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Qo'shimcha ma'lumotlar -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 card-hover">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+        <i class="fas fa-info-circle mr-3 text-blue-600 dark:text-blue-400"></i>
+        Qo'shimcha ma'lumotlar (ixtiyoriy)
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tuman</label>
+          <input type="text" name="tuman" placeholder="{{ settings.tuman }}" class="form-input" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Maktab</label>
+          <input type="text" name="maktab" placeholder="{{ settings.maktab }}" class="form-input" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">O'IBDO</label>
+          <input type="text" name="oibdo" placeholder="{{ settings.oibdo }}" class="form-input" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Metod rahbari</label>
+          <input type="text" name="metod_rahbari" placeholder="{{ settings.metod_rahbari }}" class="form-input" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fan o'qituvchisi</label>
+          <input type="text" name="fan_oqituvchisi" placeholder="{{ settings.fan_oqituvchisi }}" class="form-input" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Yaratish tugmasi -->
+    <div class="text-center pt-8">
+      <button type="submit" style="background-color: #16a34a; color: white; font-weight: bold; padding: 1rem 3.5rem; border-radius: 0.75rem; font-size: 1.25rem; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#15803d'" onmouseout="this.style.backgroundColor='#16a34a'">
+        <i class="fas fa-file-excel mr-3"></i>
+        Excel fayl yaratish va yuklab olish
+      </button>
+      <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Fayl avtomatik ravishda yaratiladi va yuklab olinadi</p>
+    </div>
+  </form>
+
+  <!-- Umumiy sozlamalar -->
+  <div class="mt-16">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+      <button type="button" id="settings-toggle" class="w-full text-left flex justify-between items-center p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+        <div class="flex items-center">
+          <div class="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg mr-4">
+            <i class="fas fa-cog text-purple-600 dark:text-purple-400"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Umumiy sozlamalar</h3>
+            <p class="text-gray-600 dark:text-gray-400">Maktab va o'qituvchi ma'lumotlarini sozlang</p>
+          </div>
+        </div>
+        <span id="settings-arrow" class="text-2xl text-gray-500 dark:text-gray-400">▼</span>
+      </button>
+
+      <div id="settings-content" class="accordion-content">
+        <div class="p-8 border-t border-gray-200 dark:border-gray-700">
+          <form id="settings-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tuman</label>
+                <input type="text" name="tuman" value="{{ settings.tuman }}" required class="form-input" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Maktab</label>
+                <input type="text" name="maktab" value="{{ settings.maktab }}" required class="form-input" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">O'IBDO</label>
+                <input type="text" name="oibdo" value="{{ settings.oibdo }}" class="form-input" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Metod birlashma rahbari</label>
+                <input type="text" name="metod_rahbari" value="{{ settings.metod_rahbari }}" class="form-input" />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fan o'qituvchisi</label>
+                <input type="text" name="fan_oqituvchisi" value="{{ settings.fan_oqituvchisi }}" class="form-input" />
+              </div>
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <button type="button" id="cancel-settings" class="btn-secondary">Bekor qilish</button>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save mr-2"></i>
+                Sozlamalarni saqlash
+              </button>
+            </div>
+          </form>
+          <div id="settings-message" class="mt-6 text-center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% block extra_js %}
+<script>
+    // Global flag to prevent multiple initialization
+    if (!window.settingsAccordionInitialized) {
+        window.settingsAccordionInitialized = true;
+        
+        // Simple and reliable accordion
+        function initSettingsAccordion() {
+            const toggleBtn = document.getElementById('settings-toggle');
+            const content = document.getElementById('settings-content');
+            const arrow = document.getElementById('settings-arrow');
+            const cancelBtn = document.getElementById('cancel-settings');
+            
+            if (!toggleBtn || !content || !arrow) {
+                return;
+            }
+            
+            // Remove any existing event listeners
+            const newToggleBtn = toggleBtn.cloneNode(true);
+            toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+            
+            const newContent = content.cloneNode(true);
+            content.parentNode.replaceChild(newContent, content);
+            
+            const newArrow = arrow.cloneNode(true);
+            arrow.parentNode.replaceChild(newArrow, arrow);
+            
+            // Get fresh references after cloning
+            const freshToggleBtn = document.getElementById('settings-toggle');
+            const freshContent = document.getElementById('settings-content');
+            const freshArrow = document.getElementById('settings-arrow');
+            const freshCancelBtn = document.getElementById('cancel-settings');
+            
+            // Set initial state
+            freshContent.style.maxHeight = '0';
+            freshContent.style.overflow = 'hidden';
+            freshContent.style.transition = 'max-height 0.3s ease';
+            
+            // Toggle function
+            function toggleSettings() {
+                console.log('Toggle function called once');
+                
+                if (freshContent.style.maxHeight === '0px' || freshContent.style.maxHeight === '') {
+                    // Open
+                    freshContent.style.maxHeight = freshContent.scrollHeight + 'px';
+                    freshArrow.textContent = '▲';
+                } else {
+                    // Close
+                    freshContent.style.maxHeight = '0';
+                    freshArrow.textContent = '▼';
+                }
+            }
+            
+            // Add event listener with once option
+            freshToggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Toggle clicked - single event');
+                toggleSettings();
+            }, { once: false }); // { once: true } faqat bir marta ishlash uchun
+            
+            // Cancel button
+            if (freshCancelBtn) {
+                freshCancelBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    freshContent.style.maxHeight = '0';
+                    freshArrow.textContent = '▼';
+                });
+            }
+            
+            // Settings form
+            const settingsForm = document.getElementById('settings-form');
+            if (settingsForm) {
+                // Remove old listeners
+                const newForm = settingsForm.cloneNode(true);
+                settingsForm.parentNode.replaceChild(newForm, settingsForm);
+                
+                const freshForm = document.getElementById('settings-form');
+                
+                freshForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    const msgDiv = document.getElementById('settings-message');
+                    
+                    // Loading state
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saqlanmoqda...';
+                    submitBtn.disabled = true;
+                    
+                    try {
+                        const response = await fetch('/save-settings', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            msgDiv.innerHTML = `
+                                <div class="p-5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-xl border border-green-200 dark:border-green-800">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-circle text-2xl mr-3"></i>
+                                        <span class="font-bold">${result.message || "Sozlamalar saqlandi!"}</span>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Update placeholders
+                            const updates = {
+                                tuman: formData.get('tuman'),
+                                maktab: formData.get('maktab'),
+                                oibdo: formData.get('oibdo'),
+                                metod_rahbari: formData.get('metod_rahbari'),
+                                fan_oqituvchisi: formData.get('fan_oqituvchisi')
+                            };
+                            
+                            Object.keys(updates).forEach(field => {
+                                document.querySelectorAll(`input[name="${field}"]`).forEach(input => {
+                                    if (input.type !== 'hidden') {
+                                        input.placeholder = updates[field];
+                                    }
+                                });
+                            });
+                            
+                            // Auto-close accordion
+                            setTimeout(() => {
+                                msgDiv.innerHTML = '';
+                                freshContent.style.maxHeight = '0';
+                                freshArrow.textContent = '▼';
+                            }, 3000);
+                            
+                        } else {
+                            msgDiv.innerHTML = `
+                                <div class="p-5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-xl border border-red-200 dark:border-red-800">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-exclamation-circle text-2xl mr-3"></i>
+                                        <span class="font-bold">${result.message || "Xatolik yuz berdi!"}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                    } catch (error) {
+                        msgDiv.innerHTML = `
+                            <div class="p-5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-xl border border-red-200 dark:border-red-800">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-circle text-2xl mr-3"></i>
+                                    <span class="font-bold">Server bilan bog'lanishda xato</span>
+                                </div>
+                            </div>
+                        `;
+                    } finally {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+        }
+        
+        // Initialize
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSettingsAccordion);
+        } else {
+            initSettingsAccordion();
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}
