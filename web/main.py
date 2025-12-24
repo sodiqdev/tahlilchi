@@ -88,7 +88,11 @@ async def get_base_context(request: Request):
             "active_profile_name": "Default",
             "is_admin": True
         }
-    
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("web/static/favicon.ico")
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     context = await get_base_context(request)
