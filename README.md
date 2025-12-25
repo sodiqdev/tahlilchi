@@ -1,2 +1,12 @@
-# tahlilchi
-Yangi baholash tizimidagi SUMMATIV baholash imtihonlari tahlilini sinf, fan, topshiriqlar soni, maksimal ballari va boshqa bir nechta ma'lumotlar asosida excel template yaratib beruvchi dastur. Bir nechta sozlashlardan keyin dastur to'liq o'qituvchiga mos ma'lumotlarni avtomatik to'ldiradi.
+# Baholash Tahlili Generator
+
+## O'rnatish
+1. `python -m venv venv`
+2. `venv\Scripts\activate` (Windows) yoki `source venv/bin/activate` (Mac/Linux)
+3. `pip install -r requirements.txt`
+4. `python web/main.py`
+
+## Foydalanish
+1. http://localhost:8000 oching
+2. Avval "Admin Panel" dan sinf va talabalarni yuklang
+3. Asosiy sahifadan Excel fayl yarating

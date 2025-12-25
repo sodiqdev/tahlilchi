@@ -1,15 +1,30 @@
+# Data papkalari - GitHubga yuklanmasin
+data/profiles/*
+!data/profiles/README.md
+data/uploads/
+data/outputs/
+
+# Fayllar
+settings.json
+subjects.json
+students_data.json
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.python-version
 
+# Environment
 .env
+.venv
 venv/
-.env/
-.venv/
+env/
 
-.idea/
+# IDE
 .vscode/
-
-dist/
-build/
+.idea/
+*.swp
+*.swo
+*~

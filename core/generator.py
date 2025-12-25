@@ -19,8 +19,15 @@ from .styles import *
 from .file_utils import get_safe_filename, ensure_output_dir
 
 
-def create_assessment_template(students_list, num_tasks, config=None,
-                               max_scores=None, output_dir="."):
+from typing import List, Dict, Optional
+
+def create_assessment_template(
+    students_list: List[str],
+    num_tasks: int,
+    config: Optional[Dict] = None,
+    max_scores: Optional[List[float]] = None,
+    output_dir: str = "."
+) -> Dict:
 
     # 1. Validatsiya
     validate_students_list(students_list)
