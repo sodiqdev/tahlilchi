@@ -244,8 +244,6 @@ async function deleteClass(className) {
         const response = await fetch('/admin/delete-class', {
             method: 'POST',
             body: formData
-            // FormData bilan ishlaganda Content-Type ni o'rnatmaslik kerak,
-            // brauzer avtomatik 'multipart/form-data' deb o'rnatadi
         });
         
         const result = await response.json();
@@ -286,7 +284,7 @@ async function deleteClass(className) {
                 // Agar element topilmasa, 1.5 sekunddan keyin sahifani yangilash
                 setTimeout(() => {
                     location.reload();
-                }, 1500);
+                }, 1000);
             }
         } else {
             // Xatolik xabarini ko'rsatish

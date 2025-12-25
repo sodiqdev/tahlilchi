@@ -4,18 +4,13 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
-import shutil
-import json
 
 from app.profile_manager import ProfileManager
-from core.generator import create_assessment_template
 from app.controller import AppController
 from app.settings_manager import SettingsManager
 
 import pandas as pd
-from openpyxl import load_workbook
 from io import BytesIO, StringIO
-from utils.data_manager import load_students_data, save_students_data, get_classes, get_students
 
 app = FastAPI(title="Baholash Tahlili Generator")
 
@@ -294,27 +289,6 @@ async def switch_profile(request: Request):
     response = JSONResponse({"success": True, "message": "Profil o'zgartirildi"})
     response.set_cookie(key="active_profile", value=profile_id, max_age=30*24*60*60)
     return response
-
-# @app.post("/profile/create")
-# async def create_profile(request: Request):
-#     data = await request.json()
-#     name = data.get("name", "").strip()
-#     owner = data.get("owner", "user").strip()
-#     base_profile = data.get("base_profile", "default")
-    
-#     if not name:
-#         return JSONResponse({"success": False, "message": "Profil nomi kerak"})
-    
-#     try:
-#         profile_id = profile_manager.create_profile_(name, owner, base_profile)
-#         return JSONResponse({
-#             "success": True,
-#             "message": "Profil yaratildi",
-#             "profile_id": profile_id,
-#             "profile_name": name
-#         })
-#     except Exception as e:
-#         return JSONResponse({"success": False, "message": str(e)})
 
 
 @app.get("/profile/master-data")

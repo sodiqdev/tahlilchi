@@ -12,15 +12,15 @@ def validate_num_tasks(num_tasks):
 
 def prepare_config(config: dict | None) -> dict:
     default_config = {
-        'tuman': 'Shovot tumani',
-        'maktab': '5-maktab',
-        'sinf': '10 V',
-        'fan': 'algebra',
-        'chorak': '4',
-        'imtihon_nomi': '8-BSB',
-        'oibdo': 'U.Sadiqov',
-        'metod_rahbari': 'D.Nurjanova',
-        'fan_oqituvchisi': 'S.Sodiqov'
+        'tuman': 'tuman',
+        'maktab': 'maktab',
+        'sinf': 'sinf',
+        'fan': 'fan',
+        'chorak': '1',
+        'imtihon_nomi': 'BSB',
+        'oibdo': 'oibdo',
+        'metod_rahbari': 'metod rahbari',
+        'fan_oqituvchisi': 'fan oqituvchisi',
     }
 
     if config is None:

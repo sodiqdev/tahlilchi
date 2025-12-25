@@ -62,7 +62,7 @@ class ProfileManager:
         
         default_profile = {
             "profile_id": "default",
-            "profile_name": "Default Profil",
+            "profile_name": "Tahlilchi",
             "owner": "system",
             "created_at": datetime.now().isoformat(),
             "last_modified": datetime.now().isoformat(),
@@ -76,8 +76,8 @@ class ProfileManager:
                 "output_dir": settings.get("output_dir", "outputs")
             },
             "data": {
-                "classes": master_classes.copy(),  # Copy from master
-                "subjects": master_subjects.copy()  # Copy from master
+                "classes": master_classes.copy(),  
+                "subjects": master_subjects.copy()
             },
             "meta": {
                 "is_master": True,
