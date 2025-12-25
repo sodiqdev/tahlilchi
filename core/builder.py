@@ -6,7 +6,7 @@ from .formula import *
 def build_title(ws, config, last_col_letter):
     title = (
         f"{config['tuman']}dagi {config['maktab']}ning {config['sinf']} "
-        f"{config['fan']} fanidan o'tkazilgan {config['chorak']}-chorak "
+        f"{config['fan']} fanidan o'tkazilgan 2025-2026 o'quv yili{config['chorak']}-chorak "
         f"{config['imtihon_nomi']} tahlili"
     )
 

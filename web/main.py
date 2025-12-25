@@ -14,7 +14,7 @@ from app.settings_manager import SettingsManager
 
 import pandas as pd
 from openpyxl import load_workbook
-from io import BytesIO
+from io import BytesIO, StringIO
 from utils.data_manager import load_students_data, save_students_data, get_classes, get_students
 
 app = FastAPI(title="Baholash Tahlili Generator")
@@ -39,12 +39,10 @@ async def get_base_context(request: Request):
     try:
         # Get active profile ID
         active_profile_id = request.cookies.get("active_profile", "default")
-        print(f"🔍 Active profile ID: {active_profile_id}")
         
         # Get active profile
         profile = profile_manager.get_profile(active_profile_id)
         if not profile:
-            print(f"⚠️ Profile {active_profile_id} topilmadi, default ga o'tildi")
             active_profile_id = "default"
             profile = profile_manager.get_profile("default")
         
@@ -52,15 +50,12 @@ async def get_base_context(request: Request):
         settings = profile.get("settings", {}) if profile else {}
         classes = controller.get_classes(active_profile_id)
         subjects = controller.get_subjects(active_profile_id)
-        
-        print(f"📊 Profile data: {len(classes)} classes, {len(subjects)} subjects")
-        
+                
         # Dark mode
         dark_mode = get_dark_mode(request)
         
         # Get all profiles for selector
         all_profiles = profile_manager.list_profiles()
-        print(f"📋 Total profiles: {len(all_profiles)}")
         
         return {
             "request": request,
@@ -75,7 +70,6 @@ async def get_base_context(request: Request):
         }
         
     except Exception as e:
-        print(f"❌ Error in get_base_context: {e}")
         # Return minimal context on error
         return {
             "request": request,
@@ -538,13 +532,16 @@ async def admin_upload(request: Request, file: UploadFile = File(...)):
     contents = await file.read()
 
     try:
+
         if b'<html' in contents.lower()[:100] or filename.endswith(('.html', '.htm')):
-            df_list = pd.read_html(BytesIO(contents), flavor='lxml', encoding='utf-8')
+            html_text = contents.decode('utf-8', errors='ignore')
+            df_list: list[pd.DataFrame] = pd.read_html(StringIO(html_text), flavor='lxml')
         else:
             engine = 'openpyxl' if filename.endswith('.xlsx') else 'xlrd'
-            df_list = pd.read_excel(BytesIO(contents), header=None, engine=engine)
+            df = pd.read_excel(BytesIO(contents), header=None, engine=engine)
+            df_list: list[pd.DataFrame] = [df]
 
-        if not df_list:
+        if len(df_list) == 0:
             context["error"] = "Jadval topilmadi!"
             return templates.TemplateResponse("admin_upload.html", context)
 
@@ -558,6 +555,7 @@ async def admin_upload(request: Request, file: UploadFile = File(...)):
 
         names_series = df_data.iloc[:, 1].dropna()
         classes_series = df_data.iloc[:, 5].dropna()
+
 
         min_len = min(len(names_series), len(classes_series))
         names = names_series.iloc[:min_len].astype(str).str.strip().tolist()
@@ -612,7 +610,7 @@ async def journal_upload(
     context = await get_base_context(request)
     active_profile_id = request.cookies.get("active_profile", "default")
     
-    if not file.filename.lower().endswith(('.xls', '.xlsx')):
+    if not file.filename or not file.filename.lower().endswith(('.xls', '.xlsx')):
         context["error"] = "Faqat .xls yoki .xlsx fayl!"
         return templates.TemplateResponse("journal_upload.html", context)
 
@@ -810,10 +808,8 @@ else:
     try:
         os.makedirs(static_dir, exist_ok=True)
         app.mount("/static", StaticFiles(directory=static_dir), name="static")
-        print(f"✅ Created {static_dir} directory")
     except:
-        print(f"⚠️ Could not create {static_dir}, static files disabled")
-
+        pass
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
